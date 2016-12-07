@@ -15,7 +15,12 @@ namespace AAI_Log_Converter
         public string partnerName;
         public LineInfo lineInfo = new LineInfo();
 
-        public FileImporter(string path)
+        public void ImportColumns(string path)
+        {
+
+        }
+
+        public void FileImport(string path)
         {
             AddServiceToDataObject(path);
             SetPartnerName(path);
@@ -32,8 +37,8 @@ namespace AAI_Log_Converter
         private void AddServiceToDataObject(string path)
         {
             serviceName = FileUtils.GetFileName(path);
-            if (!Program.PerServiceData.ContainsKey(serviceName)) {
-                Program.PerServiceData.Add(serviceName, new List<ColumnInfo>(10000000));
+            if (!Program.perServiceData.ContainsKey(serviceName)) {
+                Program.perServiceData.Add(serviceName, new BigList());
             }
         }
 
@@ -42,9 +47,10 @@ namespace AAI_Log_Converter
             ColumnInfo columnInfo = new ColumnInfo();
             string line = "";
             Console.WriteLine("Converting " + path);
+            ConversionRules conversionRules = new ConversionRules();
             using (TextReader tr = new StreamReader(path)) {
                 while ((line = tr.ReadLine()) != null) {
-                    new ConversionRules(ref columnInfo, serviceName, line.Trim(), this);
+                    conversionRules.Convert(ref columnInfo, serviceName, line.Trim(), this);
                 }
                 GC.Collect();
                 GC.WaitForPendingFinalizers();

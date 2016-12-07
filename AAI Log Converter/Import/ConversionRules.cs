@@ -19,43 +19,36 @@ namespace AAI_Log_Converter.Import
         private const string ColumnName_Partner = "PartnerID";
         private const string ColumnName_Date = "Date";
         private const string ColumnName_Time = "Time";
-
-        private FileImporter fileImporter;
-        private string serviceName;
         
-        public ConversionRules(ref ColumnInfo columnInfo, string serviceName, string fileLine, FileImporter fileImporter)
+        
+        public void Convert(ref ColumnInfo columnInfo, string serviceName, string fileLine, FileImporter fileImporter)
         {
-            this.fileImporter = fileImporter;
-            this.serviceName = serviceName;
 
             SetDynamicDataStructureNames(fileLine, fileImporter);
 
             SetParameterGroups(fileLine, fileImporter);
             
-            AddParameter(columnInfo, fileLine, fileImporter);
+            AddParameter(columnInfo, fileLine, fileImporter, serviceName);
 
             ClearParameterGroups(fileLine, fileImporter);
 
             ClearDynamicDataStructureNames(fileLine, fileImporter);
             
-            ProccessIfEndOfService(columnInfo, serviceName, fileLine);
+            ProccessIfEndOfService(columnInfo, serviceName, fileLine, fileImporter);
 
-            columnInfo = AddIfService(columnInfo, fileLine);
-
-            
-            
+            columnInfo = AddIfService(columnInfo, fileLine, serviceName);
             
         }
 
-        private void ProccessIfEndOfService(ColumnInfo columnInfo, string serviceName, string fileLine)
+        private void ProccessIfEndOfService(ColumnInfo columnInfo, string serviceName, string fileLine, FileImporter fileImporter)
         {
             if (LineContains(fileLine, Id_EndOfServiceCall)) {
                 AddDateTimeToColumnInfo(columnInfo, fileLine);
                 columnInfo.AddColumnInfo(ColumnName_Partner, fileImporter.partnerName);
                 FilePathImporter.CallLogInfo.AddColumnInfo(ColumnName_Partner, fileImporter.partnerName);
                 //add the column info at the end of each service call
-                Program.PerServiceData[serviceName].Add(columnInfo);
-                Program.CallLogData[Program.CallLogName].Add(FilePathImporter.CallLogInfo);
+                Program.perServiceData[serviceName].Add(columnInfo);
+                Program.callLogData[Program.CallLogName].Add(FilePathImporter.CallLogInfo);
             }
         }
 
@@ -111,7 +104,7 @@ namespace AAI_Log_Converter.Import
             }
         }
 
-        private void AddParameter(ColumnInfo columnInfo, string fileLine, FileImporter fileImporter)
+        private void AddParameter(ColumnInfo columnInfo, string fileLine, FileImporter fileImporter, string serviceName)
         {
             if (LineContains(fileLine, Id_Parameter)) {
                 string[] nameValue = fileLine.Split(Id_Parameter.ToCharArray());
@@ -119,12 +112,13 @@ namespace AAI_Log_Converter.Import
                 string parameterGroupName = BuildColumnPrefix(fileImporter.lineInfo.parameterGroupName);
                 string dynamicDataStructureName = BuildColumnPrefix(fileImporter.lineInfo.dynamicDataStructureName);
                 string dynamicDataStructureSubGroupID = BuildColumnPrefix(fileImporter.lineInfo.dynamicDataStructureSubGroupID);
-                string columnName = parameterGroupName + dynamicDataStructureName + dynamicDataStructureSubGroupID + nameValue[0];
+                string columnName =  parameterGroupName + dynamicDataStructureName + dynamicDataStructureSubGroupID + nameValue[0];
                 //get the parameter value from the line
                 string columnValue = nameValue[1];
                 //add the columnName and Value to the columnInfo class
-                columnInfo.AddColumnInfo(BuildColumnPrefix(serviceName) + columnName, columnValue);
-                AddColumnUsageStatistics(BuildColumnPrefix(serviceName) + columnName, columnValue);
+                columnInfo.AddColumnInfo(columnName, columnValue);
+                columnName = BuildColumnPrefix(serviceName) + columnName;
+                AddColumnUsageStatistics(columnName, columnValue);
             }
         }
 
@@ -172,10 +166,11 @@ namespace AAI_Log_Converter.Import
             }
         }
 
-        private ColumnInfo AddIfService(ColumnInfo columnInfo, string fileLine)
+        private ColumnInfo AddIfService(ColumnInfo columnInfo, string fileLine, string serviceName)
         {
             if (LineContains(fileLine, Id_ServiceCall)) {
                 // create new instance of Column info for each service call
+                columnInfo = null;
                 columnInfo = new ColumnInfo();
                 FilePathImporter.CallLogInfo = new ColumnInfo();
                 FilePathImporter.CallLogInfo.AddColumnInfo("Service Name", serviceName);

@@ -14,8 +14,8 @@ namespace AAI_Log_Converter.Import
         public string dynamicDataStructureSubGroupID = ""; //if the dynamicDataStructureName has value then set this for the parameter group if identified.
         public string parameterGroupName = ""; //populate when '{' is found empty when '}' is found
 
-        private Dictionary<string, int> columnNullCount = new Dictionary<string, int>();
-        private Dictionary<string, int> columnEmptyCount = new Dictionary<string, int>();
-        private Dictionary<string, int> columnSeenCount = new Dictionary<string, int>();
+        //private Dictionary<string, int> columnNullCount = new Dictionary<string, int>();
+        //private Dictionary<string, int> columnEmptyCount = new Dictionary<string, int>();
+        //private Dictionary<string, int> columnSeenCount = new Dictionary<string, int>();
     }
 }

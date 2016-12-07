@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 
 namespace AAI_Log_Converter.Export
@@ -14,7 +13,7 @@ namespace AAI_Log_Converter.Export
             csv.AppendLine(columnHeaders);
 
             //iterate through the call log information
-            foreach(string serviceName in Program.PerServiceData.Keys) {
+            foreach(string serviceName in Program.perServiceData.Keys) {
                 foreach (KeyValuePair<string, int> columnSeenCount in Program.columnSeenCount) {
                     csvRow = "";
                     if (columnSeenCount.Key.Contains(serviceName)) {

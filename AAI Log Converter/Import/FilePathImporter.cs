@@ -6,10 +6,12 @@ namespace AAI_Log_Converter
     class FilePathImporter
     {
         public static ColumnInfo CallLogInfo = new ColumnInfo();
+        private static FileImporter fileImporter = new FileImporter();
+
         public static void ParseArgs(string[] args)
         {
-            if (!Program.CallLogData.ContainsKey(Program.CallLogName)) {
-                Program.CallLogData.Add(Program.CallLogName, new List<ColumnInfo>(250000000));
+            if (!Program.callLogData.ContainsKey(Program.CallLogName)) {
+                Program.callLogData.Add(Program.CallLogName, new BigList());
             }
             foreach (string path in args) {
                 if (FileUtils.FileExists(path)) {
@@ -49,11 +51,19 @@ namespace AAI_Log_Converter
         {
             if (Program.ServiceName != null && !Program.ServiceName.Equals("")) {
                 if (filePath.ToLower().Contains(Program.ServiceName.ToLower())) {
-                    new FileImporter(filePath);
+                    AddServiceFilePath(Program.ServiceName, filePath);
                 }
             } else {
-                new FileImporter(filePath);
+                AddServiceFilePath(FileUtils.GetFileName(filePath), filePath);
             } 
+        }
+
+        private static void AddServiceFilePath(string serviceName, string filePath)
+        {
+            if (!Program.serviceFilePaths.ContainsKey(serviceName)) {
+                Program.serviceFilePaths.Add(serviceName, new List<string>());
+            }
+            Program.serviceFilePaths[serviceName].Add(filePath);
         }
     }
 }

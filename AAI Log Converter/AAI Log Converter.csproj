@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BigList.cs" />
     <Compile Include="Export\UsageStatisticsBuilder.cs" />
     <Compile Include="Export\DataSheetBuilder.cs" />
     <Compile Include="ColumnInfo.cs" />
