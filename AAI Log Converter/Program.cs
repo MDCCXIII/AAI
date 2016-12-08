@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AAI_Log_Converter.Export;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
@@ -52,12 +53,18 @@ namespace AAI_Log_Converter
                     fileImporter.ImportColumns(kvp.Key, filePath);
                 }
 
+                //print column names to files
+                CallLogBuilder.WriteColumnHeaders();
+                DataSheetBuilder.WriteColumnHeaders(kvp.Key);
+                UsageStatisticsBuilder.WriteColumnHeaders(kvp.Key);
+
                 foreach (string filePath in kvp.Value)
                 {
                     //Gather data per service call adding counts to memory object('s)
                     //print data per service call
                     fileImporter.ImportValues(kvp.Key, filePath);
                 }
+                UsageStatisticsBuilder.AppendRowToFile(kvp.Key);
             }
         }
 

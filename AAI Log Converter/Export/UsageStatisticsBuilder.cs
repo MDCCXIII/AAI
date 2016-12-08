@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 
 namespace AAI_Log_Converter.Export
@@ -15,19 +16,23 @@ namespace AAI_Log_Converter.Export
             int usagePercentage = 0;
 
             //iterate through the call log information
-            foreach (KeyValuePair<string, string> column in Program.serviceColumns[service])
+            foreach (DictionaryEntry column in Program.serviceColumns[service])
             {
-                if (Program.columnSeenCount[service].ContainsKey(column.Key))
+                if (Program.columnSeenCount[service].ContainsKey(column.Key.ToString()))
                 {
-                    timesCalled = Program.columnSeenCount[service][column.Key];
-                    timesNull = Program.columnNullCount[service][column.Key];
-                    timesEmpty = Program.columnEmptyCount[service][column.Key];
-                    usagePercentage = (int)(((timesCalled - (timesNull + timesEmpty)) / timesCalled) * 100);
-                    csv.AppendLine(column.Key + "," + timesCalled + "," + timesNull + "," + timesEmpty + "," + "%" + usagePercentage);
+                    timesCalled = Program.columnSeenCount[service][column.Key.ToString()];
+                    timesNull = Program.columnNullCount[service][column.Key.ToString()];
+                    timesEmpty = Program.columnEmptyCount[service][column.Key.ToString()];
+                    if(timesCalled != 0)
+                    {
+                        usagePercentage = (int)(((timesCalled - (timesNull + timesEmpty)) / timesCalled) * 100);
+                    }
+                    
+                    csv.Append("\n" + column.Key + "," + timesCalled + "," + timesNull + "," + timesEmpty + "," + "%" + usagePercentage);
+                    FileUtils.WriteToFile(service + "_Usages.csv", csv);
+                    csv.Clear();
                 }
             }
-            FileUtils.WriteToFile(service + "_Data.csv", csv);
-            csv.Clear();
         }
 
         public static void WriteColumnHeaders(string service)

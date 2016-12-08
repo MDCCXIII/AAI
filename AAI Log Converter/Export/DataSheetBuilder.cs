@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Text;
 
 namespace AAI_Log_Converter.Export
@@ -10,11 +12,11 @@ namespace AAI_Log_Converter.Export
 
             StringBuilder csv = new StringBuilder();
             //iterate through the call log information
-            foreach (KeyValuePair<string, string> column in Program.serviceColumns[service])
+            foreach (DictionaryEntry column in Program.serviceColumns[service])
             {
                 if (Program.Header_PartnerID.Equals(column.Key))
                 {
-                    csv.Append(column.Value);
+                    csv.Append("\n" + column.Value);
                 }
                 else if (!Program.Header_ServiceName.Equals(column.Key))
                 {
@@ -29,7 +31,7 @@ namespace AAI_Log_Converter.Export
         public static void WriteColumnHeaders(string service)
         {
             StringBuilder csv = new StringBuilder();
-            foreach (KeyValuePair<string, string> column in Program.serviceColumns[service])
+            foreach (DictionaryEntry column in Program.serviceColumns[service])
             {
                 if (Program.Header_PartnerID.Equals(column.Key))
                 {

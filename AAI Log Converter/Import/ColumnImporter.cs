@@ -15,25 +15,28 @@ namespace AAI_Log_Converter.Import
         private const string Id_EndOfParameterGroup = "}";
         private const string Id_EndOfServiceCall = "),";
 
-        public static LineInfo lineInfo = new LineInfo();
+        public LineInfo lineInfo = new LineInfo();
 
         internal void ImportColumns(string serviceName, string fileLine, FileImporter fileImporter)
         {
-            ClearDynamicDataStructureNames(fileLine);
-            ClearParameterGroups(fileLine);
+            
             SetDynamicDataStructureNames(fileLine);
             SetParameterGroups(fileLine);
             BuildColumnHeaders(fileLine, serviceName);
-            ProccessIfEndOfService(serviceName, fileLine, fileImporter);
+            ClearDynamicDataStructureNames(fileLine);
+            ClearParameterGroups(fileLine);
+            lineInfo.previousLine = fileLine;
         }
 
         internal bool ImportColumnValues(string serviceName, string fileLine, FileImporter fileImporter)
         {
-            ClearDynamicDataStructureNames(fileLine);
-            ClearParameterGroups(fileLine);
+            
             SetDynamicDataStructureNames(fileLine);
             SetParameterGroups(fileLine);
             GetColumnValues(fileLine, serviceName);
+            ClearDynamicDataStructureNames(fileLine);
+            ClearParameterGroups(fileLine);
+            lineInfo.previousLine = fileLine;
             return ProccessIfEndOfService(serviceName, fileLine, fileImporter);
         }
 
@@ -49,7 +52,7 @@ namespace AAI_Log_Converter.Import
             }
         }
 
-        private static void SetDynamicDataStructureNames(string fileLine)
+        private void SetDynamicDataStructureNames(string fileLine)
         {
             if (fileLine.Contains(Id_DynamicDataStructure))
             {
@@ -58,7 +61,7 @@ namespace AAI_Log_Converter.Import
             }
         }
 
-        private static void SetParameterGroups(string fileLine)
+        private void SetParameterGroups(string fileLine)
         {
             if (fileLine.Contains(Id_ParameterGroup))
             {
@@ -75,7 +78,7 @@ namespace AAI_Log_Converter.Import
             }
         }
 
-        private static void ClearParameterGroups(string fileLine)
+        private void ClearParameterGroups(string fileLine)
         {
             if (fileLine.Contains(Id_EndOfParameterGroup))
             {
@@ -98,7 +101,7 @@ namespace AAI_Log_Converter.Import
             }
         }
 
-        private static void ClearDynamicDataStructureNames(string fileLine)
+        private void ClearDynamicDataStructureNames(string fileLine)
         {
             if (fileLine.Contains(Id_EndOfDynamicDataStructure))
             {
@@ -116,7 +119,7 @@ namespace AAI_Log_Converter.Import
                 string parameterGroupName = BuildColumnPrefix(lineInfo.parameterGroupName);
                 string dynamicDataStructureName = BuildColumnPrefix(lineInfo.dynamicDataStructureName);
                 string dynamicDataStructureSubGroupID = BuildColumnPrefix(lineInfo.dynamicDataStructureSubGroupID);
-                string columnName = parameterGroupName + dynamicDataStructureName + dynamicDataStructureSubGroupID + parameterGroupName;
+                string columnName = parameterGroupName + dynamicDataStructureName + dynamicDataStructureSubGroupID + parameterName;
 
                 //add the columnName to the serviceNames class
                 AddColumnForService(serviceName, columnName);
@@ -134,7 +137,7 @@ namespace AAI_Log_Converter.Import
                 string parameterGroupName = BuildColumnPrefix(lineInfo.parameterGroupName);
                 string dynamicDataStructureName = BuildColumnPrefix(lineInfo.dynamicDataStructureName);
                 string dynamicDataStructureSubGroupID = BuildColumnPrefix(lineInfo.dynamicDataStructureSubGroupID);
-                string columnName = parameterGroupName + dynamicDataStructureName + dynamicDataStructureSubGroupID + parameterGroupName;
+                string columnName = parameterGroupName + dynamicDataStructureName + dynamicDataStructureSubGroupID + parameterName;
 
                 //add the columnName to the serviceNames class
                 Program.serviceColumns[serviceName][columnName] = value;
@@ -142,8 +145,8 @@ namespace AAI_Log_Converter.Import
             }
         }
 
-        static int lastKnownHeaderIndex = 3;
-        private static void AddColumnForService(string serviceName, string columnName)
+        private int lastKnownHeaderIndex = -1;
+        public void AddColumnForService(string serviceName, string columnName)
         {
             if (!Program.serviceColumns[serviceName].Contains(columnName))
             {
@@ -155,7 +158,7 @@ namespace AAI_Log_Converter.Import
         public static int GetIndex(OrderedDictionary dictionary, string columnName)
         {
             int index = -1;
-            foreach(string key in dictionary) {
+            foreach(string key in dictionary.Keys) {
                 index++;
                 if (key.Equals(columnName))
                 {

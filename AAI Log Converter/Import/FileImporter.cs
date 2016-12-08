@@ -19,12 +19,13 @@ namespace AAI_Log_Converter
 
         public void ImportColumns(string serviceName, string path)
         {
+            ColumnImporter columnImporter = new ColumnImporter();
             AddEntryToServiceColumns(serviceName);
-            Program.serviceColumns[serviceName].Add(Program.Header_ServiceName, "N/A");
-            Program.serviceColumns[serviceName].Add(Program.Header_PartnerID, "N/A");
-            Program.serviceColumns[serviceName].Add(Program.Header_Date, "N/A");
-            Program.serviceColumns[serviceName].Add(Program.Header_Time, "N/A");
-            ReadColumnsIntoCollection(serviceName, path);
+            columnImporter.AddColumnForService(serviceName, Program.Header_ServiceName);
+            columnImporter.AddColumnForService(serviceName, Program.Header_PartnerID);
+            columnImporter.AddColumnForService(serviceName, Program.Header_Date);
+            columnImporter.AddColumnForService(serviceName, Program.Header_Time);
+            ReadColumnsIntoCollection(serviceName, path, columnImporter);
         }
 
         public void ImportValues(string serviceName, string path)
@@ -64,10 +65,10 @@ namespace AAI_Log_Converter
 
         }
 
-        private void ReadColumnsIntoCollection(string serviceName, string path)
+        private void ReadColumnsIntoCollection(string serviceName, string path, ColumnImporter columnImporter)
         {
-            ColumnImporter columnImporter = new ColumnImporter();
             string line = "";
+            Console.WriteLine("Importing columns for " + path);
             using (TextReader tr = new StreamReader(path))
             {
                 while ((line = tr.ReadLine()) != null)
@@ -77,10 +78,8 @@ namespace AAI_Log_Converter
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
-            //print column names to files
-            CallLogBuilder.WriteColumnHeaders(path);
-            DataSheetBuilder.WriteColumnHeaders(serviceName);
-            UsageStatisticsBuilder.WriteColumnHeaders(serviceName);
+            
+            Console.WriteLine("Complete. \n");
         }
 
         private void ReadColumnValuesIntoFiles(string serviceName, string path)
@@ -95,13 +94,14 @@ namespace AAI_Log_Converter
                         //append column values to file
                         CallLogBuilder.AppendRowToFile(serviceName);
                         DataSheetBuilder.AppendRowToFile(serviceName);
-                        UsageStatisticsBuilder.AppendRowToFile(serviceName);
+                        
                         columnImporter.ClearIfNewService(line.Trim(), serviceName);
                     }
                 }
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
+            
             Console.WriteLine("Complete. \n");
         }
     }
