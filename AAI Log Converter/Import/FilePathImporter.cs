@@ -5,14 +5,11 @@ namespace AAI_Log_Converter
 {
     class FilePathImporter
     {
-        public static ColumnInfo CallLogInfo = new ColumnInfo();
+        //public static ColumnInfo CallLogInfo = new ColumnInfo();
         private static FileImporter fileImporter = new FileImporter();
 
         public static void ParseArgs(string[] args)
         {
-            if (!Program.callLogData.ContainsKey(Program.CallLogName)) {
-                Program.callLogData.Add(Program.CallLogName, new BigList());
-            }
             foreach (string path in args) {
                 if (FileUtils.FileExists(path)) {
                     // This path is a file
