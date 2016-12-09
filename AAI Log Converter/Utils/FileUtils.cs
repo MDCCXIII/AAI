@@ -4,7 +4,6 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace AAI_Log_Converter
 {
@@ -107,7 +106,7 @@ namespace AAI_Log_Converter
             return Path.GetFileName(filePath).Split('.')[0].Trim();
         }
 
-        public static void WriteToFile(string filePath, StringBuilder sb)
+        public static void WriteToFile(string fileName, StringBuilder sb)
         {
             string output = "";
             if (ConfigurationManager.AppSettings.AllKeys.Contains("OutputDirectory")) {
@@ -115,10 +114,10 @@ namespace AAI_Log_Converter
                     if (!DirectoryExists(output)) {
                         Directory.CreateDirectory(output);
                     }
-                    filePath = output + "\\" + filePath;
+                    fileName = output + "\\" + fileName;
                 }
             }
-            File.AppendAllText(filePath, sb.ToString());
+            File.AppendAllText(fileName, sb.ToString());
         }
     }
 }

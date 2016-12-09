@@ -46,9 +46,8 @@
   <ItemGroup>
     <Compile Include="Export\UsageStatisticsBuilder.cs" />
     <Compile Include="Export\DataSheetBuilder.cs" />
-    <Compile Include="ColumnInfo.cs" />
     <Compile Include="Export\CallLogBuilder.cs" />
-    <Compile Include="Import\ConversionRules.cs" />
+    <Compile Include="Import\ColumnImporter.cs" />
     <Compile Include="Import\FileImporter.cs" />
     <Compile Include="Import\FilePathImporter.cs" />
     <Compile Include="Utils\FileUtils.cs" />

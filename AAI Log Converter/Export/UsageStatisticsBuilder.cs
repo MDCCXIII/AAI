@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,31 +6,41 @@ namespace AAI_Log_Converter.Export
 {
     internal class UsageStatisticsBuilder
     {
-        internal static void Build()
+        public static void AppendRowToFile(string service)
         {
+
             StringBuilder csv = new StringBuilder();
-            string columnHeaders = "Parameter Name, Times Called, Times Null, Times Empty, Usage Percentage";
-            string csvRow = "";
-            csv.AppendLine(columnHeaders);
+            double timesCalled = 0;
+            double timesNull = 0;
+            double timesEmpty = 0;
+            int usagePercentage = 0;
 
             //iterate through the call log information
-            foreach(string serviceName in Program.PerServiceData.Keys) {
-                foreach (KeyValuePair<string, int> columnSeenCount in Program.columnSeenCount) {
-                    csvRow = "";
-                    if (columnSeenCount.Key.Contains(serviceName)) {
-                        string parameterName = columnSeenCount.Key.Replace(serviceName + "_", "");
-                        double timesCalled = columnSeenCount.Value;
-                        double timesNull = Program.columnNullCount[columnSeenCount.Key];
-                        double timesEmpty = Program.columnEmptyCount[columnSeenCount.Key];
-                        int usagePercentage = (int)(((timesCalled - (timesNull + timesEmpty)) / timesCalled) * 100);
-                        csvRow += parameterName + ", " + timesCalled + ", " + timesNull + ", " + timesEmpty + ", " + "%" + usagePercentage;
-                        csv.AppendLine(csvRow);
+            foreach (DictionaryEntry column in Program.serviceColumns[service])
+            {
+                if (Program.columnSeenCount[service].ContainsKey(column.Key.ToString()))
+                {
+                    timesCalled = Program.columnSeenCount[service][column.Key.ToString()];
+                    timesNull = Program.columnNullCount[service][column.Key.ToString()];
+                    timesEmpty = Program.columnEmptyCount[service][column.Key.ToString()];
+                    if(timesCalled != 0)
+                    {
+                        usagePercentage = (int)(((timesCalled - (timesNull + timesEmpty)) / timesCalled) * 100);
                     }
+                    
+                    csv.Append("\n" + column.Key + "," + timesCalled + "," + timesNull + "," + timesEmpty + "," + "%" + usagePercentage);
+                    FileUtils.WriteToFile(service + "_Usages.csv", csv);
+                    csv.Clear();
                 }
-                FileUtils.WriteToFile(serviceName + "_Usages.csv", csv);
-                csv.Clear();
-                csv.AppendLine(columnHeaders);
             }
         }
-    }
+
+        public static void WriteColumnHeaders(string service)
+        {
+            StringBuilder csv = new StringBuilder("Parameter Name, Times Called, Times Null, Times Empty, Usage Percentage");
+            FileUtils.WriteToFile(service + "_Usages.csv", csv);
+            csv.Clear();
+        }
+    
+}
 }
