@@ -8,8 +8,6 @@ namespace AAI_Log_Converter
 {
     class Program
     {
-        public static List<string> lColumnHeaders = new List<string>();
-
         public const string CallLogName = "Call Log";
         public const string Header_Date = "Date";
         public const string Header_Time = "Time";
@@ -65,6 +63,11 @@ namespace AAI_Log_Converter
                     fileImporter.ImportValues(kvp.Key, filePath);
                 }
                 UsageStatisticsBuilder.AppendRowToFile(kvp.Key);
+                serviceColumns[kvp.Key].Clear();
+                serviceColumns.Clear();
+                columnEmptyCount.Clear();
+                columnNullCount.Clear();
+                columnSeenCount.Clear();
             }
         }
 

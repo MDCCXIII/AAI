@@ -15,7 +15,12 @@ namespace AAI_Log_Converter.Import
         private const string Id_EndOfParameterGroup = "}";
         private const string Id_EndOfServiceCall = "),";
 
-        public LineInfo lineInfo = new LineInfo();
+        public LineInfo lineInfo;
+
+        public ColumnImporter()
+        {
+            lineInfo = new LineInfo();
+        }
 
         internal void ImportColumns(string serviceName, string fileLine, FileImporter fileImporter)
         {
@@ -45,9 +50,9 @@ namespace AAI_Log_Converter.Import
             if (fileLine.Contains(Id_ServiceCall))
             {
                 // Default column values to N/A for each new service record.
-                foreach(string key in Program.serviceColumns[serviceName].Keys)
+                for(int i = 0; i<Program.serviceColumns[serviceName].Count; i++)
                 {
-                    Program.serviceColumns[serviceName][key] = "N/A";
+                    Program.serviceColumns[serviceName][i] = "N/A";
                 }
             }
         }
@@ -57,7 +62,7 @@ namespace AAI_Log_Converter.Import
             if (fileLine.Contains(Id_DynamicDataStructure))
             {
                 //set the dynamic data structure name
-                lineInfo.dynamicDataStructureName = fileLine.Replace(Id_DynamicDataStructure, "");
+                lineInfo.dynamicDataStructureName.Add(fileLine.Replace(Id_DynamicDataStructure, ""));
             }
         }
 
@@ -105,7 +110,7 @@ namespace AAI_Log_Converter.Import
         {
             if (fileLine.Contains(Id_EndOfDynamicDataStructure))
             {
-                lineInfo.dynamicDataStructureName = "";
+                lineInfo.dynamicDataStructureName.RemoveAt(lineInfo.dynamicDataStructureName.Count - 1);
             }
         }
 
