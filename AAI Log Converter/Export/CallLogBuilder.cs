@@ -1,14 +1,19 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Text;
 
 namespace AAI_Log_Converter.Export
 {
     class CallLogBuilder
     {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Appends a row to the file. </summary>
+        ///
+        /// <remarks>   Ahaynes, 12/13/2016. </remarks>
+        ///
+        /// <param name="service">  The service. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         public static void AppendRowToFile(string service)
         {
-            
             StringBuilder csv = new StringBuilder();
             //iterate through the call log information
             foreach(DictionaryEntry column in Program.serviceColumns[service])
@@ -30,6 +35,11 @@ namespace AAI_Log_Converter.Export
             csv.Clear();
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Writes the column headers. </summary>
+        ///
+        /// <remarks>   Ahaynes, 12/13/2016. </remarks>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         public static void WriteColumnHeaders()
         {
             StringBuilder csv = new StringBuilder();

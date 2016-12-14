@@ -8,17 +8,22 @@ using System.Linq;
 
 namespace AAI_Log_Converter
 {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>
-    /// This class takes in a file path and passes each line of that file to the ConversionRules class
+    ///     This class takes in a file path and passes each line of that file to the ConversionRules
+    ///     class.
     /// </summary>
+    ///
+    /// <remarks>   Ahaynes, 12/13/2016. </remarks>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     class FileImporter
     {
-        internal static string serviceName;
         public string partnerName;
         public LineInfo lineInfo = new LineInfo();
 
         public void ImportColumns(string serviceName, string path)
         {
+            
             ColumnImporter columnImporter = new ColumnImporter();
             AddEntryToServiceColumns(serviceName);
             columnImporter.AddColumnForService(serviceName, Program.Header_ServiceName);
@@ -28,14 +33,27 @@ namespace AAI_Log_Converter
             ReadColumnsIntoCollection(serviceName, path, columnImporter);
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Import values. </summary>
+        ///
+        /// <remarks>   Ahaynes, 12/13/2016. </remarks>
+        ///
+        /// <param name="serviceName">  Name of the service. </param>
+        /// <param name="path">         Full pathname of the file. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         public void ImportValues(string serviceName, string path)
         {
             SetPartnerName(path);
             ReadColumnValuesIntoFiles(serviceName, path);
         }
 
-        
-
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Adds an entry to service columns. </summary>
+        ///
+        /// <remarks>   Ahaynes, 12/13/2016. </remarks>
+        ///
+        /// <param name="serviceName">  Name of the service. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         private static void AddEntryToServiceColumns(string serviceName)
         {
             if (!Program.serviceColumns.ContainsKey(serviceName))
@@ -56,8 +74,13 @@ namespace AAI_Log_Converter
             }
         }
 
-        
-
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Sets partner name. </summary>
+        ///
+        /// <remarks>   Ahaynes, 12/13/2016. </remarks>
+        ///
+        /// <param name="path"> Full pathname of the file. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         private void SetPartnerName(string path)
         {
             string[] filePathParts = path.Split('\\');
@@ -65,28 +88,43 @@ namespace AAI_Log_Converter
 
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Reads columns into collection. </summary>
+        ///
+        /// <remarks>   Ahaynes, 12/13/2016. </remarks>
+        ///
+        /// <param name="serviceName">      Name of the service. </param>
+        /// <param name="path">             Full pathname of the file. </param>
+        /// <param name="columnImporter">   The column importer instance. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         private void ReadColumnsIntoCollection(string serviceName, string path, ColumnImporter columnImporter)
         {
+            ServiceLogger.WriteLine("Importing columns for " + path);
             string line = "";
-            Console.WriteLine("Importing columns for " + path);
             using (TextReader tr = new StreamReader(path))
             {
                 while ((line = tr.ReadLine()) != null)
                 {
-                    columnImporter.ImportColumns(serviceName, line.Trim(), this);
+                    columnImporter.ImportColumnNames(serviceName, line.Trim(), this);
                 }
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
-            
-            Console.WriteLine("Complete. \n");
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Reads column values into files. </summary>
+        ///
+        /// <remarks>   Ahaynes, 12/13/2016. </remarks>
+        ///
+        /// <param name="serviceName">  Name of the service. </param>
+        /// <param name="path">         Full pathname of the file. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         private void ReadColumnValuesIntoFiles(string serviceName, string path)
         {
+            ServiceLogger.WriteLine("Converting " + path);
             ColumnImporter columnImporter = new ColumnImporter();
             string line = "";
-            Console.WriteLine("Converting " + path);
             using (TextReader tr = new StreamReader(path)) {
                 while ((line = tr.ReadLine()) != null) {
                     if(columnImporter.ImportColumnValues(serviceName, line.Trim(), this))
@@ -101,8 +139,6 @@ namespace AAI_Log_Converter
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
-            
-            Console.WriteLine("Complete. \n");
         }
     }
 }
