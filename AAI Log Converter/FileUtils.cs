@@ -32,6 +32,10 @@ namespace AAI_Log_Converter
                     if (filePath.EndsWith(extension)) {
                         return true;
                     }
+                    else
+                    {
+                        ServiceLogger.WriteLine("SKIPPED FILE:: The file " + filePath + " does not have the file extension " + extension + ".");
+                    }
                 }
             } else {
                 throw new Exception("No file extensions have been added to the ValidFileExtensions List.");

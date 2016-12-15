@@ -79,17 +79,18 @@ namespace AAI_Log_Converter
             ServiceLogger.CreateLogFileDirectory();
             ServiceLogger.WriteLine();
             OutputDirectory = GetOutputDirectory();
+            FileUtils.ValidFileExtensions.Add(".txt");
             try
             {
                 //if no arguments where passed set the default source directory from the appconfig
                 if (args.Length == 0) {
                     if(!ConfigurationManager.AppSettings.AllKeys.Contains("DefaultSourceDirectory"))
                     {
-                        throw new Exception("App.config, Key: DefaultSourceDirectory, missing.");
+                        throw new Exception("App.config, Key: DefaultSourceDirectory, missing. Please pass source directory as argument.");
                     }
                     if (ConfigurationManager.AppSettings["DefaultSourceDirectory"].Equals(""))
                     {
-                        throw new Exception("App.config, Key: DefaultSourceDirectory, value is empty.");
+                        throw new Exception("App.config, Key: DefaultSourceDirectory, value is empty. Please pass source directory as argument.");
                     }
                     args = new string[] { ConfigurationManager.AppSettings["DefaultSourceDirectory"] };
                 }
@@ -120,7 +121,7 @@ namespace AAI_Log_Converter
             }
             catch (Exception ex)
             {
-                ServiceLogger.WriteLine("ERROR:: " + ex.Message, new StackTrace(ex).GetFrame(0).GetMethod().Name, new StackTrace(ex).GetFrame(0).GetFileName(), new StackTrace(ex).GetFrame(0).GetFileLineNumber());
+                ServiceLogger.WriteLine("ERROR:: " + ex.Message, new StackTrace(ex).GetFrame(0).GetMethod().Name, ex.Source, new StackTrace(ex).GetFrame(0).GetFileLineNumber());
                 MessageBox.Show(ex.Message, "AAI Log Converter - ERROR", MessageBoxButtons.OK);
             }
             
@@ -194,7 +195,7 @@ namespace AAI_Log_Converter
         private static string GetOutputDirectory()
         {
             ServiceLogger.WriteLine();
-            string result = Directory.GetCurrentDirectory() + "Converted AAI Logs\\";
+            string result = Directory.GetCurrentDirectory() + "\\Converted AAI Logs\\";
             if (ConfigurationManager.AppSettings.AllKeys.Contains("OutputDirectory"))
             {
                 if (!ConfigurationManager.AppSettings["OutputDirectory"].Equals(""))

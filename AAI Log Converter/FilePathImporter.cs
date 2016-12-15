@@ -24,7 +24,7 @@ namespace AAI_Log_Converter
                 ServiceLogger.WriteLine("--- Picked up arg: " + path + " ---");
                 if (FileUtils.FileExists(path)) {
                     // This path is a file
-                    if (FileUtils.FileIsValid(path) && !FileUtils.IsFileinUse(path)) {
+                    if (!FileUtils.IsFileinUse(path)) {
                         ProcessFile(path);
                     }
                 } else if (FileUtils.DirectoryExists(path)) {
@@ -100,12 +100,16 @@ namespace AAI_Log_Converter
         private static void AddServiceFilePath(string serviceName, string filePath)
         {
             ServiceLogger.WriteLine();
-            if (!Program.serviceFilePaths.ContainsKey(serviceName)) {
-                Program.serviceFilePaths.Add(serviceName, new List<string>());
+            if (FileUtils.FileIsValid(filePath))
+            {
+                if (!Program.serviceFilePaths.ContainsKey(serviceName))
+                {
+                    Program.serviceFilePaths.Add(serviceName, new List<string>());
+                }
+                Program.serviceFilePaths[serviceName].Add(filePath);
+                ServiceLogger.WriteLine("--- Loaded File: " + filePath + " for conversion ---");
+                Program.FileConfirmationMessage += filePath + "\n";
             }
-            Program.serviceFilePaths[serviceName].Add(filePath);
-            ServiceLogger.WriteLine("--- Loaded File: " + filePath + " for conversion ---");
-            Program.FileConfirmationMessage += filePath + "\n";
         }
     }
 }
