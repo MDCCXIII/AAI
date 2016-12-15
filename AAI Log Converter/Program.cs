@@ -83,6 +83,14 @@ namespace AAI_Log_Converter
             {
                 //if no arguments where passed set the default source directory from the appconfig
                 if (args.Length == 0) {
+                    if(!ConfigurationManager.AppSettings.AllKeys.Contains("DefaultSourceDirectory"))
+                    {
+                        throw new Exception("App.config, Key: DefaultSourceDirectory, missing.");
+                    }
+                    if (ConfigurationManager.AppSettings["DefaultSourceDirectory"].Equals(""))
+                    {
+                        throw new Exception("App.config, Key: DefaultSourceDirectory, value is empty.");
+                    }
                     args = new string[] { ConfigurationManager.AppSettings["DefaultSourceDirectory"] };
                 }
 
@@ -186,7 +194,7 @@ namespace AAI_Log_Converter
         private static string GetOutputDirectory()
         {
             ServiceLogger.WriteLine();
-            string result = Directory.GetCurrentDirectory();
+            string result = Directory.GetCurrentDirectory() + "Converted AAI Logs\\";
             if (ConfigurationManager.AppSettings.AllKeys.Contains("OutputDirectory"))
             {
                 if (!ConfigurationManager.AppSettings["OutputDirectory"].Equals(""))
