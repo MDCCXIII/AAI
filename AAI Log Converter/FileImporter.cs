@@ -132,9 +132,8 @@ namespace AAI_Log_Converter
                         //append column values to file
                         CallLogBuilder.AppendRowToFile(serviceName);
                         DataSheetBuilder.AppendRowToFile(serviceName);
-                        
-                        columnImporter.ClearIfNewService(line.Trim(), serviceName);
                     }
+                    columnImporter.ClearIfNewService(line.Trim(), serviceName);
                 }
                 GC.Collect();
                 GC.WaitForPendingFinalizers();

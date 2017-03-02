@@ -93,13 +93,14 @@ namespace AAI_Log_Converter.Import
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         internal void ClearIfNewService(string fileLine, string serviceName)
         {
-            if (fileLine.Contains(serviceName.ToUpper() + Id_ServiceCall))
+            if (fileLine.ToUpper().Contains(serviceName.ToUpper()) && fileLine.Contains(Id_ServiceCall))
             {
                 // Default column values to N/A for each new service record.
-                for(int i = 0; i<Program.serviceColumns[serviceName].Count; i++)
+                for(int i = 0; i < Program.serviceColumns[serviceName].Count; i++)
                 {
                     Program.serviceColumns[serviceName][i] = "N/A";
                 }
+                //lineInfo = new LineInfo();
             }
         }
 
@@ -115,6 +116,7 @@ namespace AAI_Log_Converter.Import
             if (fileLine.Contains(Id_ParameterArrayGroup))
             {
                 //set the dynamic data structure name
+                AppendFullColumnName(fileLine.Replace(Id_ParameterArrayGroup, ""));
                 lineInfo.dynamicDataStructureName.Add(fileLine.Replace(Id_ParameterArrayGroup, ""));
             }
         }
@@ -133,13 +135,27 @@ namespace AAI_Log_Converter.Import
                 if (!lineInfo.dynamicDataStructureName.Equals(""))
                 {
                     //set the dynamic data structure sub group id if the structures name is defined
+                    AppendFullColumnName(lineInfo.previousLine);
                     lineInfo.dynamicDataStructureSubGroupID.Add(lineInfo.previousLine);
                 }
                 else
                 {
                     //if the dynamic data structure name is not set then set the parameter group name
+                    AppendFullColumnName(lineInfo.previousLine);
                     lineInfo.parameterGroupName.Add(lineInfo.previousLine);
                 }
+            }
+        }
+
+        private void AppendFullColumnName(string line)
+        {
+            if (lineInfo.FullColumnName.Equals(""))
+            {
+                lineInfo.FullColumnName += line;
+            }
+            else
+            {
+                lineInfo.FullColumnName += "_" + line;
             }
         }
 
@@ -159,6 +175,12 @@ namespace AAI_Log_Converter.Import
                     //clear the dynamic data structure sub group id if the structures name is defined
                     if(lineInfo.dynamicDataStructureSubGroupID.Count > 0)
                     {
+                        int subStart = lineInfo.FullColumnName.LastIndexOf(lineInfo.dynamicDataStructureSubGroupID[lineInfo.dynamicDataStructureSubGroupID.Count - 1]);
+                        int subLength = lineInfo.dynamicDataStructureSubGroupID[lineInfo.dynamicDataStructureSubGroupID.Count - 1].Length;
+                        if (subStart > -1)
+                        {
+                            lineInfo.FullColumnName = lineInfo.FullColumnName.Remove(subStart, subLength).Replace("__", "_").Trim('_');
+                        }
                         lineInfo.dynamicDataStructureSubGroupID.RemoveAt(lineInfo.dynamicDataStructureSubGroupID.Count - 1);
                     }
                 }
@@ -167,6 +189,12 @@ namespace AAI_Log_Converter.Import
                     //if the dynamic data structure name is not set then clear the parameter group name
                     if(lineInfo.parameterGroupName.Count > 0)
                     {
+                        int subStart = lineInfo.FullColumnName.LastIndexOf(lineInfo.parameterGroupName[lineInfo.parameterGroupName.Count - 1]);
+                        int subLength = lineInfo.parameterGroupName[lineInfo.parameterGroupName.Count - 1].Length;
+                        if (subStart > -1)
+                        {
+                            lineInfo.FullColumnName = lineInfo.FullColumnName.Remove(subStart, subLength).Replace("__", "_").Trim('_');
+                        }
                         lineInfo.parameterGroupName.RemoveAt(lineInfo.parameterGroupName.Count - 1);
                     }
                 }
@@ -184,6 +212,12 @@ namespace AAI_Log_Converter.Import
         {
             if (fileLine.Contains(Id_ParameterArrayGroupEnd))
             {
+                int subStart = lineInfo.FullColumnName.LastIndexOf(lineInfo.dynamicDataStructureName[lineInfo.dynamicDataStructureName.Count - 1]);
+                int subLength = lineInfo.dynamicDataStructureName[lineInfo.dynamicDataStructureName.Count - 1].Length;
+                if (subStart > -1)
+                {
+                    lineInfo.FullColumnName = lineInfo.FullColumnName.Remove(subStart, subLength).Replace("__", "_").Trim('_');
+                }
                 lineInfo.dynamicDataStructureName.RemoveAt(lineInfo.dynamicDataStructureName.Count - 1);
             }
         }
@@ -224,10 +258,17 @@ namespace AAI_Log_Converter.Import
         private string BuildColumnName(string fileLine)
         {
             string parameterName = fileLine.Split(Id_Parameter.ToCharArray())[0];
-            string parameterGroupName = BuildColumnHeaderPrefix(lineInfo.parameterGroupName);
-            string dynamicDataStructureName = BuildColumnHeaderPrefix(lineInfo.dynamicDataStructureName);
-            string dynamicDataStructureSubGroupID = BuildColumnHeaderPrefix(lineInfo.dynamicDataStructureSubGroupID);
-            return parameterGroupName + dynamicDataStructureName + dynamicDataStructureSubGroupID + parameterName;
+            //string parameterGroupName = BuildColumnHeaderPrefix(lineInfo.parameterGroupName);
+            //string dynamicDataStructureName = BuildColumnHeaderPrefix(lineInfo.dynamicDataStructureName);
+            //string dynamicDataStructureSubGroupID = BuildColumnHeaderPrefix(lineInfo.dynamicDataStructureSubGroupID);
+            if (lineInfo.FullColumnName.Equals(""))
+            {
+                return parameterName;
+            }
+            else
+            {
+                return lineInfo.FullColumnName + "_" + parameterName;
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
