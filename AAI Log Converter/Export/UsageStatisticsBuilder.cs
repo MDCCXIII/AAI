@@ -1,14 +1,19 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Text;
 
 namespace AAI_Log_Converter.Export
 {
     internal class UsageStatisticsBuilder
     {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Appends a row to the file. </summary>
+        ///
+        /// <remarks>   Ahaynes, 12/13/2016. </remarks>
+        ///
+        /// <param name="service">  The service. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         public static void AppendRowToFile(string service)
         {
-
             StringBuilder csv = new StringBuilder();
             double timesCalled = 0;
             double timesNull = 0;
@@ -35,6 +40,13 @@ namespace AAI_Log_Converter.Export
             }
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Writes the column headers. </summary>
+        ///
+        /// <remarks>   Ahaynes, 12/13/2016. </remarks>
+        ///
+        /// <param name="service">  The service. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         public static void WriteColumnHeaders(string service)
         {
             StringBuilder csv = new StringBuilder("Parameter Name, Times Called, Times Null, Times Empty, Usage Percentage");
